@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0f766e"/>
+  <path d="M117 319c76-74 202-74 278 0" fill="none" stroke="#ffffff" stroke-width="38" stroke-linecap="round"/>
+  <path d="M174 262c45-42 119-42 164 0" fill="none" stroke="#ffffff" stroke-width="34" stroke-linecap="round" opacity=".88"/>
+  <circle cx="256" cy="350" r="28" fill="#ffffff"/>
+  <text x="256" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="96" font-weight="800" fill="#ffffff">NJ</text>
+</svg>

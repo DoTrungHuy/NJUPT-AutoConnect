@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="南京邮电大学校园网手动一键认证工具">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <title>NJUPT AutoConnect</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #5c6672;
+      --line: #d9dee5;
+      --primary: #0f766e;
+      --primary-dark: #0b5d57;
+      --danger: #b42318;
+      --warn-bg: #fff7e6;
+      --warn-line: #f3c96b;
+      --radius: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      padding: 24px 14px;
+    }
+
+    main {
+      width: min(100%, 460px);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 32px rgba(31, 41, 55, 0.08);
+      padding: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #0f766e;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      font-size: 22px;
+      line-height: 1.2;
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .sub {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .saved {
+      padding: 12px;
+      background: #eef8f7;
+      border: 1px solid #b7dfdb;
+      border-radius: var(--radius);
+      margin-bottom: 14px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 0 12px;
+      font: inherit;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    input:focus,
+    select:focus {
+      outline: 2px solid rgba(15, 118, 110, 0.22);
+      border-color: var(--primary);
+    }
+
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin: 14px 0;
+      color: var(--muted);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .check input {
+      width: 18px;
+      min-height: 18px;
+      margin: 2px 0 0;
+    }
+
+    button,
+    .fallback {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: #fff;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      text-decoration: none;
+      letter-spacing: 0;
+    }
+
+    button:hover,
+    .fallback:hover {
+      background: var(--primary-dark);
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
+    .fallback {
+      margin-top: 10px;
+      background: #334155;
+    }
+
+    .fallback:hover {
+      background: #1f2937;
+    }
+
+    .links {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .link {
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      min-height: auto;
+      width: auto;
+      padding: 0;
+      font-size: 14px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .link:hover {
+      background: transparent;
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .notice {
+      margin: 16px 0 0;
+      padding: 11px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .notice.warn {
+      border-color: var(--warn-line);
+      background: var(--warn-bg);
+      color: #76520a;
+    }
+
+    .notice.error {
+      border-color: #f0b3ae;
+      background: #fff1f0;
+      color: var(--danger);
+    }
+
+    .notice.ok {
+      border-color: #b7dfdb;
+      background: #eef8f7;
+      color: #0b5d57;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 420px) {
+      main {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="brand">
+      <div class="mark" aria-hidden="true">NJ</div>
+      <div>
+        <h1>NJUPT AutoConnect</h1>
+        <p class="sub">连上南邮 Wi-Fi 后，点一下认证校园网。</p>
+      </div>
+    </header>
+
+    <section id="savedPanel" class="saved" hidden></section>
+
+    <form id="loginForm" autocomplete="on">
+      <div id="accountField">
+        <label for="username">账号</label>
+        <input id="username" name="username" autocomplete="username" placeholder="学号或校园网账号" required>
+      </div>
+
+      <div id="passwordField">
+        <label for="password">密码</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="校园网密码" required>
+      </div>
+
+      <div id="ispField">
+        <label for="isp">运营商</label>
+        <select id="isp" name="isp">
+          <option value="ctcc">电信 @njxy</option>
+          <option value="cmcc">移动 @cmcc</option>
+          <option value="njupt">教育网</option>
+        </select>
+      </div>
+
+      <label id="rememberField" class="check">
+        <input id="rememberPassword" type="checkbox" checked>
+        <span>记住密码，仅建议在自己的设备上使用。不勾选时以后每次只需要补填密码。</span>
+      </label>
+
+      <button id="connectButton" type="submit">连接校园网</button>
+    </form>
+
+    <a id="fallbackLink" class="fallback" href="#" target="_blank" rel="noreferrer" hidden>打开登录链接</a>
+
+    <div class="links">
+      <button id="editButton" class="link" type="button" hidden>修改信息</button>
+      <button id="clearButton" class="link" type="button" hidden>清除本机保存信息</button>
+    </div>
+
+    <div id="status" class="notice warn">账号密码只保存在当前浏览器，不会上传到任何服务器。</div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "njupt.autoconnect.profile.v1";
+    const PORTAL_URL = "https://p.njupt.edu.cn:802/eportal/portal/login";
+    const labels = {
+      ctcc: "电信 @njxy",
+      cmcc: "移动 @cmcc",
+      njupt: "教育网"
+    };
+
+    const form = document.querySelector("#loginForm");
+    const username = document.querySelector("#username");
+    const password = document.querySelector("#password");
+    const isp = document.querySelector("#isp");
+    const rememberPassword = document.querySelector("#rememberPassword");
+    const accountField = document.querySelector("#accountField");
+    const passwordField = document.querySelector("#passwordField");
+    const ispField = document.querySelector("#ispField");
+    const rememberField = document.querySelector("#rememberField");
+    const connectButton = document.querySelector("#connectButton");
+    const fallbackLink = document.querySelector("#fallbackLink");
+    const savedPanel = document.querySelector("#savedPanel");
+    const statusBox = document.querySelector("#status");
+    const editButton = document.querySelector("#editButton");
+    const clearButton = document.querySelector("#clearButton");
+
+    let compactMode = false;
+    let lastLoginUrl = "";
+
+    init();
+
+    function init() {
+      const profile = loadProfile();
+      if (profile) {
+        fillForm(profile);
+        clearButton.hidden = false;
+        if (profile.password) {
+          showCompact(profile);
+        } else {
+          setStatus("已记住账号和运营商，请补填密码后连接。", "warn");
+        }
+      }
+
+      form.addEventListener("submit", handleSubmit);
+      editButton.addEventListener("click", () => showForm());
+      clearButton.addEventListener("click", clearProfile);
+      registerServiceWorker();
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      hideFallback();
+      const profile = readForm();
+      if (!profile.username || !profile.password) {
+        setStatus("请填写账号和密码。", "error");
+        return;
+      }
+
+      saveProfile(profile);
+      if (profile.rememberPassword) {
+        showCompact(profile);
+      }
+
+      await connect(profile);
+    }
+
+    async function connect(profile) {
+      lastLoginUrl = buildLoginUrl(profile);
+      connectButton.disabled = true;
+      connectButton.textContent = "正在连接...";
+      setStatus("正在提交认证请求。", "warn");
+
+      try {
+        const data = await jsonp(lastLoginUrl);
+        if (isSuccess(data)) {
+          setStatus(readMessage(data) || "认证成功，可以尝试打开网页。", "ok");
+        } else {
+          setStatus(readMessage(data) || "认证没有返回成功结果，可以尝试备用链接。", "error");
+          showFallback();
+        }
+      } catch (error) {
+        setStatus("浏览器没有收到认证结果，可以尝试备用链接。", "error");
+        showFallback();
+      } finally {
+        connectButton.disabled = false;
+        connectButton.textContent = "连接校园网";
+      }
+    }
+
+    function readForm() {
+      return {
+        username: username.value.trim(),
+        password: password.value,
+        isp: isp.value,
+        rememberPassword: rememberPassword.checked
+      };
+    }
+
+    function fillForm(profile) {
+      username.value = profile.username || "";
+      password.value = profile.password || "";
+      isp.value = profile.isp || "ctcc";
+      rememberPassword.checked = profile.rememberPassword !== false;
+    }
+
+    function showCompact(profile) {
+      compactMode = true;
+      savedPanel.hidden = false;
+      savedPanel.textContent = `${maskAccount(profile.username)} · ${labels[profile.isp] || labels.ctcc}`;
+      accountField.hidden = true;
+      passwordField.hidden = true;
+      ispField.hidden = true;
+      rememberField.hidden = true;
+      editButton.hidden = false;
+      clearButton.hidden = false;
+      setStatus("已保存信息，之后打开页面点一次即可认证。", "ok");
+    }
+
+    function showForm() {
+      compactMode = false;
+      savedPanel.hidden = true;
+      accountField.hidden = false;
+      passwordField.hidden = false;
+      ispField.hidden = false;
+      rememberField.hidden = false;
+      editButton.hidden = true;
+      clearButton.hidden = false;
+      hideFallback();
+      setStatus("修改后点击连接会自动保存新的本机信息。", "warn");
+    }
+
+    function saveProfile(profile) {
+      const stored = {
+        username: profile.username,
+        isp: profile.isp,
+        rememberPassword: profile.rememberPassword
+      };
+      if (profile.rememberPassword) {
+        stored.password = profile.password;
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+      clearButton.hidden = false;
+    }
+
+    function loadProfile() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (error) {
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+    }
+
+    function clearProfile() {
+      localStorage.removeItem(STORAGE_KEY);
+      form.reset();
+      isp.value = "ctcc";
+      rememberPassword.checked = true;
+      showForm();
+      clearButton.hidden = true;
+      setStatus("已清除本机保存信息。", "ok");
+    }
+
+    function buildLoginUrl(profile) {
+      const params = new URLSearchParams({
+        callback: "dr1003",
+        login_method: "1",
+        user_account: `,0,${profile.username}${suffix(profile.isp)}`,
+        user_password: profile.password,
+        wlan_user_ip: "",
+        wlan_user_ipv6: "",
+        wlan_user_mac: "000000000000",
+        wlan_ac_ip: "",
+        wlan_ac_name: "",
+        jsVersion: "4.1.3",
+        terminal_type: "1",
+        lang: "zh-cn",
+        v: String(Date.now())
+      });
+      return `${PORTAL_URL}?${params.toString()}`;
+    }
+
+    function suffix(value) {
+      if (value === "cmcc") return "@cmcc";
+      if (value === "njupt") return "";
+      return "@njxy";
+    }
+
+    function jsonp(url) {
+      return new Promise((resolve, reject) => {
+        const previous = window.dr1003;
+        const script = document.createElement("script");
+        let done = false;
+
+        function cleanup() {
+          done = true;
+          script.remove();
+          if (previous) {
+            window.dr1003 = previous;
+          } else {
+            delete window.dr1003;
+          }
+        }
+
+        const timer = window.setTimeout(() => {
+          if (!done) {
+            cleanup();
+            reject(new Error("timeout"));
+          }
+        }, 8500);
+
+        window.dr1003 = (payload) => {
+          window.clearTimeout(timer);
+          cleanup();
+          resolve(payload);
+        };
+
+        script.src = url;
+        script.async = true;
+        script.onerror = () => {
+          window.clearTimeout(timer);
+          cleanup();
+          reject(new Error("script error"));
+        };
+        document.body.appendChild(script);
+      });
+    }
+
+    function isSuccess(data) {
+      if (!data) return false;
+      return data.result === 1 || data.result === "1" || /成功/.test(readMessage(data));
+    }
+
+    function readMessage(data) {
+      if (!data) return "";
+      if (typeof data === "string") return data;
+      return data.msg || data.message || "";
+    }
+
+    function showFallback() {
+      fallbackLink.href = lastLoginUrl;
+      fallbackLink.hidden = false;
+    }
+
+    function hideFallback() {
+      fallbackLink.hidden = true;
+      fallbackLink.removeAttribute("href");
+    }
+
+    function setStatus(message, type) {
+      statusBox.className = `notice ${type || ""}`.trim();
+      statusBox.textContent = message;
+    }
+
+    function maskAccount(value) {
+      if (!value || value.length <= 4) return value || "";
+      return `${value.slice(0, 2)}***${value.slice(-2)}`;
+    }
+
+    function registerServiceWorker() {
+      if (!("serviceWorker" in navigator)) return;
+      if (location.protocol !== "https:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+        return;
+      }
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
+  </script>
+</body>
+</html>

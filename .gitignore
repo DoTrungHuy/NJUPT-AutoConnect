@@ -1,0 +1,19 @@
+# Build output
+bin/
+dist/
+build/
+out/
+
+# Editors and OS files
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local credentials and logs
+*.log
+*.local
+*.secret
+*.dpapi
+config.json
