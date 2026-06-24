@@ -14,7 +14,7 @@
 
 ## GitHub Pages
 
-仓库发布到 GitHub 后，可以开启 GitHub Pages，把入口指向 `web/` 目录。用户提前打开一次页面后，Service Worker 会缓存页面，后面校园网未认证时也能打开工具界面。
+仓库发布到 GitHub 后，内置 GitHub Actions 会把 `web/` 目录发布到 GitHub Pages。用户提前打开一次页面后，Service Worker 会缓存页面，后面校园网未认证时也能打开工具界面。
 
 如果没有开启 Pages，也可以直接下载仓库后打开 `web/index.html`。本地文件模式下不能注册 Service Worker，但一键认证功能仍可用。
 

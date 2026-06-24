@@ -41,6 +41,7 @@ web/manifest.webmanifest       add-to-home-screen metadata
 web/icon.svg                   simple local app icon
 scripts/windows/connect.cmd    double-click launcher
 scripts/windows/connect.ps1    DPAPI-backed Windows one-click script
+.github/workflows/pages.yml    publishes web/ to GitHub Pages
 ```
 
 ## Constraints
