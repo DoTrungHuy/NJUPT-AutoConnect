@@ -5,7 +5,8 @@
 <h1 align="center">NJUPT-AutoConnect</h1>
 
 <p align="center">
-  南京邮电大学校园网手动一键认证工具。第一次填账号、密码、运营商，之后连上南邮 Wi-Fi 后点一下即可联网。
+  南京邮电大学校园网手动一键认证工具。
+  首次连接填账号、密码、运营商，连上 Wi-Fi 后点一下即可联网。
 </p>
 
 <p align="center">
