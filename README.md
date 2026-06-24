@@ -6,7 +6,8 @@
 
 <p align="center">
   南京邮电大学校园网手动一键认证工具。
-  首次连接填账号、密码、运营商，连上 Wi-Fi 后点一下即可联网。
+  首次连接填账号、密码、运营商，
+  连上 Wi-Fi 后点一下即可联网。
 </p>
 
 <p align="center">
@@ -23,7 +24,7 @@
 
 | 入口 | 适合设备 | 怎么用 |
 | --- | --- | --- |
-| [在线 PWA](https://dotrunghuy.github.io/NJUPT-AutoConnect/) | 手机、平板、电脑 | 打开页面，填一次信息，以后点“连接校园网” |
+| [在线 PWA](https://dotrunghuy.github.io/NJUPT-AutoConnect/) | 手机、平板、电脑 | 打开页面填信息|
 | `web/index.html` | 离线/本地测试 | 下载仓库后直接打开本地页面 |
 | `scripts/windows/connect.cmd` | Windows 电脑 | 双击脚本，首次配置后再次双击即可连接 |
 
