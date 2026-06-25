@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 $AppDir = Join-Path $env:APPDATA "NJUPT-AutoConnect"
 $ConfigPath = Join-Path $AppDir "config.json"
 $SecretPath = Join-Path $AppDir "password.dpapi"
-$PortalUrl = "https://p.njupt.edu.cn:802/eportal/portal/login"
+$FastPortalUrl = "http://10.10.244.11:801/eportal/portal/login"
 $CheckUrl = "http://connect.rom.miui.com/generate_204"
 
 function Ensure-AppDir {
@@ -105,28 +105,32 @@ function Test-Online {
 function Build-LoginUrl($Config, [string]$Password) {
     $account = ",0,$($Config.Account)$(Get-Suffix $Config.Isp)"
     $pairs = [ordered]@{
-        callback = "dr1003"
         login_method = "1"
         user_account = $account
         user_password = $Password
-        wlan_user_ip = ""
-        wlan_user_ipv6 = ""
-        wlan_user_mac = "000000000000"
-        wlan_ac_ip = ""
-        wlan_ac_name = ""
-        jsVersion = "4.1.3"
-        terminal_type = "1"
-        lang = "zh-cn"
-        v = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds().ToString()
     }
     $query = ($pairs.GetEnumerator() | ForEach-Object {
         "{0}={1}" -f [Uri]::EscapeDataString($_.Key), [Uri]::EscapeDataString([string]$_.Value)
     }) -join "&"
-    return "$PortalUrl`?$query"
+    return "$FastPortalUrl`?$query"
+}
+
+function Invoke-LoginRequest([string]$LoginUrl) {
+    $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+    if ($null -ne $curl) {
+        $output = & $curl.Source --noproxy "*" --silent --show-error --max-time 10 $LoginUrl 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            return [string]$output
+        }
+        throw "curl.exe failed: $output"
+    }
+
+    $response = Invoke-WebRequest -Uri $LoginUrl -TimeoutSec 10 -UseBasicParsing
+    return [string]$response.Content
 }
 
 function Test-Success([string]$Body) {
-    return $Body.Contains('"result":1') -or $Body.Contains("认证成功") -or $Body.Contains("登录成功")
+    return $Body.Contains('"result":1') -or $Body.Contains("认证成功") -or $Body.Contains("登录成功") -or $Body.Contains("success")
 }
 
 $config = Load-Config
@@ -160,10 +164,9 @@ if (Test-Online) {
 $plainPassword = ConvertTo-PlainText $securePassword
 try {
     $loginUrl = Build-LoginUrl $config $plainPassword
-    Write-Host "Submitting portal login..."
+    Write-Host "Opening NJUPT intranet login endpoint..."
     try {
-        $response = Invoke-WebRequest -Uri $loginUrl -TimeoutSec 10 -UseBasicParsing
-        $body = [string]$response.Content
+        $body = Invoke-LoginRequest $loginUrl
         if (Test-Success $body) {
             Write-Host "Login request accepted."
             exit 0

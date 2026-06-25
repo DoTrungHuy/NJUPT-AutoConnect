@@ -20,21 +20,43 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-64748b?style=for-the-badge">
 </p>
 
+## 现在推荐怎么用
+
+这个版本改成了更适合校园网未认证状态的校内直连方式：
+
+```text
+http://10.10.244.11:801/eportal/portal/login
+```
+
+第一次有网时打开 [在线 PWA](https://dotrunghuy.github.io/NJUPT-AutoConnect/)，填好账号密码后页面会生成 **收藏直连链接**。以后即使 GitHub Pages 因为校园网未认证打不开，也可以直接从收藏夹点这个直连链接。
+
 ## 快速使用
 
 | 入口 | 适合设备 | 怎么用 |
 | --- | --- | --- |
-| [在线 PWA](https://dotrunghuy.github.io/NJUPT-AutoConnect/) | 手机、平板、电脑 | 打开页面填信息|
+| [在线 PWA](https://dotrunghuy.github.io/NJUPT-AutoConnect/) | 手机、平板、电脑 | 第一次有网时打开并保存信息 |
+| 收藏直连链接 | 手机、平板、电脑 | 断网/未认证时从收藏夹直接点 |
 | `web/index.html` | 离线/本地测试 | 下载仓库后直接打开本地页面 |
 | `scripts/windows/connect.cmd` | Windows 电脑 | 双击脚本，首次配置后再次双击即可连接 |
 
 ## 日常路径
 
 1. 连接 `NJUPT`、`NJUPT-CMCC` 或 `NJUPT-CHINANET`。
-2. 打开 NJUPT-AutoConnect。
+2. 打开 NJUPT-AutoConnect；如果页面打不开，用之前保存的直连收藏。
 3. 点击 **连接校园网**。
 
 首次使用时需要填写账号、密码和运营商。保存后，页面会收起表单，只保留连接按钮和修改/清除入口。
+
+## 为什么未认证时打不开页面
+
+GitHub Pages 是外网站点。设备刚连上南邮 Wi-Fi 但还没认证时，通常只能访问校内 Portal，不能访问 GitHub，所以在线页面可能打不开。
+
+解决办法有两个：
+
+- 提前打开一次页面并添加到主屏幕，让浏览器缓存 PWA。
+- 首次保存信息后，把页面显示的 **收藏直连链接** 加入收藏夹。这个链接直接访问校内网关 IP，不依赖 GitHub Pages。
+
+直连链接里包含账号和密码，只建议保存在自己的手机或电脑上。
 
 ## 添加到主屏幕
 
@@ -66,7 +88,7 @@
 
 ## 备用方案
 
-如果页面的一键请求被浏览器、证书或校园网策略拦住，页面会显示 **打开登录链接**。点开备用链接后，浏览器会直接访问南邮 Portal 登录地址。
+如果页面跳转被浏览器拦住，页面会显示 **手动打开直连登录**。点开后，浏览器会直接访问南邮校内网关登录地址。
 
 Windows 用户也可以使用脚本版：
 

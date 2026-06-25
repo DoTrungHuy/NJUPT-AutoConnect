@@ -177,6 +177,23 @@
       flex-wrap: wrap;
     }
 
+    .direct {
+      display: block;
+      margin-top: 10px;
+      padding: 11px 12px;
+      border: 1px dashed #9aa7b5;
+      border-radius: var(--radius);
+      color: #334155;
+      font-size: 13px;
+      line-height: 1.45;
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    .direct strong {
+      color: var(--primary);
+    }
+
     .link {
       border: 0;
       background: transparent;
@@ -278,19 +295,23 @@
       <button id="connectButton" type="submit">连接校园网</button>
     </form>
 
-    <a id="fallbackLink" class="fallback" href="#" target="_blank" rel="noreferrer" hidden>打开登录链接</a>
+    <a id="fallbackLink" class="fallback" href="#" target="_blank" rel="noreferrer" hidden>手动打开直连登录</a>
+    <a id="directLink" class="direct" href="#" target="_blank" rel="noreferrer" hidden>
+      <strong>收藏直连链接</strong><br>
+      未认证时打不开本页面，可以从收藏夹直接点它。链接包含账号密码，只建议保存在自己的设备上。
+    </a>
 
     <div class="links">
       <button id="editButton" class="link" type="button" hidden>修改信息</button>
       <button id="clearButton" class="link" type="button" hidden>清除本机保存信息</button>
     </div>
 
-    <div id="status" class="notice warn">账号密码只保存在当前浏览器，不会上传到任何服务器。</div>
+    <div id="status" class="notice warn">先连上南邮 Wi-Fi。首次保存后，建议收藏直连链接作为断网时的入口。</div>
   </main>
 
   <script>
     const STORAGE_KEY = "njupt.autoconnect.profile.v1";
-    const PORTAL_URL = "https://p.njupt.edu.cn:802/eportal/portal/login";
+    const FAST_PORTAL_URL = "http://10.10.244.11:801/eportal/portal/login";
     const labels = {
       ctcc: "电信 @njxy",
       cmcc: "移动 @cmcc",
@@ -308,6 +329,7 @@
     const rememberField = document.querySelector("#rememberField");
     const connectButton = document.querySelector("#connectButton");
     const fallbackLink = document.querySelector("#fallbackLink");
+    const directLink = document.querySelector("#directLink");
     const savedPanel = document.querySelector("#savedPanel");
     const statusBox = document.querySelector("#status");
     const editButton = document.querySelector("#editButton");
@@ -323,6 +345,7 @@
       if (profile) {
         fillForm(profile);
         clearButton.hidden = false;
+        updateDirectLink(profile);
         if (profile.password) {
           showCompact(profile);
         } else {
@@ -346,6 +369,7 @@
       }
 
       saveProfile(profile);
+      updateDirectLink(profile);
       if (profile.rememberPassword) {
         showCompact(profile);
       }
@@ -354,26 +378,19 @@
     }
 
     async function connect(profile) {
-      lastLoginUrl = buildLoginUrl(profile);
+      lastLoginUrl = buildFastLoginUrl(profile);
       connectButton.disabled = true;
-      connectButton.textContent = "正在连接...";
-      setStatus("正在提交认证请求。", "warn");
-
-      try {
-        const data = await jsonp(lastLoginUrl);
-        if (isSuccess(data)) {
-          setStatus(readMessage(data) || "认证成功，可以尝试打开网页。", "ok");
-        } else {
-          setStatus(readMessage(data) || "认证没有返回成功结果，可以尝试备用链接。", "error");
-          showFallback();
-        }
-      } catch (error) {
-        setStatus("浏览器没有收到认证结果，可以尝试备用链接。", "error");
-        showFallback();
-      } finally {
+      connectButton.textContent = "正在打开...";
+      setStatus("正在打开校内直连认证地址。若没有跳转，请点下面的手动直连登录。", "warn");
+      showFallback();
+      window.setTimeout(() => {
+        window.location.href = lastLoginUrl;
+      }, 250);
+      window.setTimeout(() => {
         connectButton.disabled = false;
         connectButton.textContent = "连接校园网";
-      }
+        setStatus("如果仍然连不上，请确认已经连接 NJUPT / NJUPT-CMCC / NJUPT-CHINANET，再点手动直连登录。", "warn");
+      }, 1800);
     }
 
     function readForm() {
@@ -416,6 +433,8 @@
       clearButton.hidden = false;
       hideFallback();
       setStatus("修改后点击连接会自动保存新的本机信息。", "warn");
+      const profile = readForm();
+      if (profile.username && profile.password) updateDirectLink(profile);
     }
 
     function saveProfile(profile) {
@@ -448,83 +467,24 @@
       rememberPassword.checked = true;
       showForm();
       clearButton.hidden = true;
+      directLink.hidden = true;
+      directLink.removeAttribute("href");
       setStatus("已清除本机保存信息。", "ok");
     }
 
-    function buildLoginUrl(profile) {
+    function buildFastLoginUrl(profile) {
       const params = new URLSearchParams({
-        callback: "dr1003",
         login_method: "1",
         user_account: `,0,${profile.username}${suffix(profile.isp)}`,
-        user_password: profile.password,
-        wlan_user_ip: "",
-        wlan_user_ipv6: "",
-        wlan_user_mac: "000000000000",
-        wlan_ac_ip: "",
-        wlan_ac_name: "",
-        jsVersion: "4.1.3",
-        terminal_type: "1",
-        lang: "zh-cn",
-        v: String(Date.now())
+        user_password: profile.password
       });
-      return `${PORTAL_URL}?${params.toString()}`;
+      return `${FAST_PORTAL_URL}?${params.toString()}`;
     }
 
     function suffix(value) {
       if (value === "cmcc") return "@cmcc";
       if (value === "njupt") return "";
       return "@njxy";
-    }
-
-    function jsonp(url) {
-      return new Promise((resolve, reject) => {
-        const previous = window.dr1003;
-        const script = document.createElement("script");
-        let done = false;
-
-        function cleanup() {
-          done = true;
-          script.remove();
-          if (previous) {
-            window.dr1003 = previous;
-          } else {
-            delete window.dr1003;
-          }
-        }
-
-        const timer = window.setTimeout(() => {
-          if (!done) {
-            cleanup();
-            reject(new Error("timeout"));
-          }
-        }, 8500);
-
-        window.dr1003 = (payload) => {
-          window.clearTimeout(timer);
-          cleanup();
-          resolve(payload);
-        };
-
-        script.src = url;
-        script.async = true;
-        script.onerror = () => {
-          window.clearTimeout(timer);
-          cleanup();
-          reject(new Error("script error"));
-        };
-        document.body.appendChild(script);
-      });
-    }
-
-    function isSuccess(data) {
-      if (!data) return false;
-      return data.result === 1 || data.result === "1" || /成功/.test(readMessage(data));
-    }
-
-    function readMessage(data) {
-      if (!data) return "";
-      if (typeof data === "string") return data;
-      return data.msg || data.message || "";
     }
 
     function showFallback() {
@@ -535,6 +495,16 @@
     function hideFallback() {
       fallbackLink.hidden = true;
       fallbackLink.removeAttribute("href");
+    }
+
+    function updateDirectLink(profile) {
+      if (!profile || !profile.username || !profile.password) {
+        directLink.hidden = true;
+        directLink.removeAttribute("href");
+        return;
+      }
+      directLink.href = buildFastLoginUrl(profile);
+      directLink.hidden = false;
     }
 
     function setStatus(message, type) {
